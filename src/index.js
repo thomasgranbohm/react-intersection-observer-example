@@ -3,40 +3,42 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 const App = () => {
-	const original = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-	const [items, setItems] = useState(original.slice());
 	const ref = useRef(undefined);
+	const [amount, setAmount] = useState(10);
 
-	useEffect(() => {
-		console.log("Inside useEffect: %d\n%o", items.length, items);
-	}, [items]);
-
-	useEffect(() => {
-		const callback = ([entry]) => {
+	const observer = new IntersectionObserver(
+		([entry]) => {
 			if (!entry.isIntersecting) return;
 
-			console.log("Inside callback: length: %d\n%o", items.length, items);
-			setItems([...items.slice(), ...original.slice()]);
-		};
-
-		const observer = new IntersectionObserver(callback, {
+			console.log("Amount is %d before setAmount call", amount);
+			setAmount(amount + 10);
+			console.log("Amount is %d after setAmount call", amount);
+		},
+		{
 			root: null,
 			rootMargin: "0px",
 			threshold: 0,
-		});
+		}
+	);
 
-		if (ref.current) observer.observe(ref.current);
+	useEffect(() => {
+		console.log("Amount got updated to %d", amount);
+	}, [amount]);
+
+	useEffect(() => {
+		const { current } = ref;
+		if (current) observer.observe(current);
 
 		return () => {
-			if (ref.current) observer.disconnect();
+			if (current) observer.disconnect();
 		};
-	}, [ref, items]);
+	}, [ref]);
 
 	return (
 		<div className="app">
 			<div className="list">
-				{items.map((item) => (
-					<div className="item">{item}</div>
+				{new Array(amount).fill(1).map((_, i) => (
+					<div className="item" key={i}></div>
 				))}
 				<div ref={ref}></div>
 			</div>

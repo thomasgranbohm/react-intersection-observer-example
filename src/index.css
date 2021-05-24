@@ -17,6 +17,7 @@ body {
 .list {
 	display: flex;
 	flex-direction: column;
+	counter-reset: list;
 }
 
 .item {
@@ -27,4 +28,9 @@ body {
 	text-align: center;
 	line-height: 3em;
 	font-size: 2em;
+	counter-increment: list;
+}
+
+.item::before{
+	content: counter(list) ". ";
 }
